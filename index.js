@@ -6,7 +6,7 @@ const gh = require('github-url-to-object')
 const path = require('path')
 const fs = require('fs')
 const os = require('os')
-const {format} = require('util')
+const { format } = require('util')
 const pkg = require('./package.json')
 const userAgent = format(
   '%s/%s (%s: %s)',
@@ -34,10 +34,10 @@ module.exports = function updater (opts = {}) {
 }
 
 function initUpdater (opts) {
-  const {host, repo, updateInterval, logger, electron} = opts
-  const {app, autoUpdater, dialog} = electron
+  const { host, repo, updateInterval, logger, electron } = opts
+  const { app, autoUpdater, dialog } = electron
   const feedURL = `${host}/${repo}/${process.platform}-${process.arch}/${app.getVersion()}`
-  const requestHeaders = {'User-Agent': userAgent}
+  const requestHeaders = { 'User-Agent': userAgent }
 
   function log (...args) {
     logger.log(...args)
@@ -72,7 +72,7 @@ function initUpdater (opts) {
 
   if (opts.notifyUser) {
     autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName, releaseDate, updateURL) => {
-      log('update-downloaded', arguments)
+      log('update-downloaded', [event, releaseNotes, releaseName, releaseDate, updateURL])
 
       const dialogOpts = {
         type: 'info',
@@ -82,7 +82,7 @@ function initUpdater (opts) {
         detail: 'A new version has been downloaded. Restart the application to apply the updates.'
       }
 
-      dialog.showMessageBox(dialogOpts, (response) => {
+      dialog.showMessageBox(dialogOpts).then(({ response }) => {
         if (response === 0) autoUpdater.quitAndInstall()
       })
     })
@@ -100,7 +100,7 @@ function validateInput (opts) {
     logger: console,
     notifyUser: true
   }
-  const {host, updateInterval, logger, notifyUser} = Object.assign({}, defaults, opts)
+  const { host, updateInterval, logger, notifyUser } = Object.assign({}, defaults, opts)
 
   // allows electron to be mocked in tests
   const electron = opts.electron || require('electron')
@@ -143,5 +143,5 @@ function validateInput (opts) {
     'function'
   )
 
-  return {host, repo, updateInterval, logger, electron, notifyUser}
+  return { host, repo, updateInterval, logger, electron, notifyUser }
 }
